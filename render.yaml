@@ -1,35 +1,42 @@
 services:
   - type: web
-    name: reddit-thread-tracker
-    runtime: python
+    name: reddit-negative-thread-tracker
+    runtime: node
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: npm ci && npx prisma db push && npm run build
+    startCommand: npm run start
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.8
+      - key: NODE_VERSION
+        value: 22.13.1
       - key: DATABASE_URL
         sync: false
-      - key: SERPER_API_KEY
+      - key: SERPAPI_API_KEY
         sync: false
-      - key: ALERT_WEBHOOK_URL
+      - key: OPENAI_API_KEY
         sync: false
-      - key: ALERT_SECRET
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: RESEND_API_KEY
+        sync: false
+      - key: ALERT_EMAIL_FROM
+        sync: false
+      - key: ALERT_EMAIL_TO
+        sync: false
+      - key: CRON_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_APP_URL
         sync: false
 
   - type: cron
-    name: reddit-thread-tracker-scan
-    runtime: python
-    plan: free
-    schedule: "0 * * * *"
-    buildCommand: pip install -r requirements.txt
-    startCommand: python -m app.cron_scan
+    name: reddit-negative-thread-tracker-cron
+    runtime: node
+    schedule: "0 */6 * * *"
+    buildCommand: npm ci
+    startCommand: npm run render:cron
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.8
-      - key: DATABASE_URL
+      - key: NODE_VERSION
+        value: 22.13.1
+      - key: CRON_TARGET_URL
         sync: false
-      - key: SERPER_API_KEY
-        sync: false
-      - key: ALERT_WEBHOOK_URL
+      - key: CRON_SECRET
         sync: false

@@ -1,6 +1,10 @@
-__pycache__/
-*.py[cod]
-.venv/
+node_modules/
+.next/
+out/
 .env
-reddit_tracker.db
-.pytest_cache/
+.env*.local
+*.log
+coverage/
+dist/
+prisma/dev.db
+tsconfig.tsbuildinfo
